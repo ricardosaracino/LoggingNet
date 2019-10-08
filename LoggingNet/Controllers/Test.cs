@@ -7,14 +7,15 @@ using System.Web.Http;
 
 namespace LoggingNet.Controllers
 {
-    public class Test : Controller
+    public class TestController : ApiController
     {
+        // GET: api/test
         public IEnumerable<object> Get()
         {
-            var context = System.Web.HttpContext.Current;
-            context.Session.Add("id", (Guid.NewGuid()).ToString());
-
-            return new List<object>();
+            return new List<object>()
+            {
+                "TEST"
+            };
         }
     }
 }

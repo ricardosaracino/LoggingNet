@@ -2,20 +2,40 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
+using LoggingNet.Models;
+using Serilog;
 
 namespace LoggingNet.Handlers
 {
-    public class LoggingHandler: DelegatingHandler
+    /// <summary>
+    /// https://gist.github.com/mrshridhara/0f6a4ed1277dbc467f75
+    /// </summary>
+    public class LoggingHandler : DelegatingHandler
     {
-        protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        private readonly ILogger _logger;
+
+        public LoggingHandler(ILogger logger)
         {
-            Console.WriteLine("TestHandler Before Request");
+            _logger = logger;
+        }
 
-            var response = await base.SendAsync(request, cancellationToken);
+         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            var startTime = DateTime.Now;
 
-            Console.WriteLine("TestHandler After Request");
+            // MUST CALL AWAIT FOR SESSION
+            var responseMessage = await base.SendAsync(request, cancellationToken);
+            
+            var endTime = DateTime.Now;
+            
+            var currentUser = (CurrentUser)HttpContext.Current?.Session?["currentUser"];
 
-            return response;
+            _logger.Information("{0} {1} {2} {3}", request.Method, request.RequestUri.AbsolutePath,
+                (endTime - startTime).TotalSeconds, currentUser?.Id);
+            
+            return responseMessage;
         }
     }
 }

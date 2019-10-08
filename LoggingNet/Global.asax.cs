@@ -14,11 +14,11 @@ namespace LoggingNet
     {
         protected void Application_PostAuthorizeRequest()
         {
+            // THIS IS NOT A REST API 
             HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Required);
         }
-
-
-        void Application_Start(object sender, EventArgs e)
+        
+        private void Application_Start(object sender, EventArgs e)
         {
             // Code that runs on application startup
             AreaRegistration.RegisterAllAreas();
